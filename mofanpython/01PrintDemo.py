@@ -1,0 +1,5 @@
+print('a')
+print("hello" + "world")
+print("hello" + str(4))
+print(int("5") + 4)
+print(float("3.2") + 7)
