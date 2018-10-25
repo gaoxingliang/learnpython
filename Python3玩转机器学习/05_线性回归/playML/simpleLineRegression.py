@@ -18,6 +18,8 @@ class SimpleLinearRegression1:
         y_mean = np.mean(y_train)
         fenzi = 0.0
         fenmu = 0.0
+        # zip 相当于把每个元素都取出来 一组一组 类似于双层for 循环
+        # 这里 a_ b_计算公式参考notebook
         for x, y in zip(x_train, y_train):
             fenzi += (x - x_mean) * (y - y_mean)
             fenmu += (x - x_mean) ** 2
