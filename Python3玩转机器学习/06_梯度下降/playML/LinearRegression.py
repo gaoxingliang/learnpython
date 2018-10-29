@@ -38,9 +38,9 @@ class LinearRegression:
         def J(theta, X_b, y):
             # 计算损失函数 这里采用的是平方错误 也就是实际值 - 预测值   然后在平方
             try:
-                return np.sum((y - X_b.dot(theta)) ** 2) / len(y_train)
+                return np.sum((y - X_b.dot(theta)) ** 2) / len(y)
             except:
-                return float("inf")
+                return float('inf')
 
         def dJ(theta, X_b, y):
             # 计算偏导数 也就是梯度
@@ -55,18 +55,19 @@ class LinearRegression:
             # return res
 
             # 方法2 直接向量化计算
-            return X_b.T.dot(X_b.dot(theta) - y) * 2 / len(y)
+            return X_b.T.dot(X_b.dot(theta) - y) * 2. / len(X_b)
 
 
         def gd(X_b, y, initial_theta, eta, epsilon = 1e-8, n_iterations=1e4):
             n_iters = 0
             theta = initial_theta
             while n_iters < n_iterations:
+                gradient = dJ(theta, X_b, y)
                 lastTheta = theta
                 # 每一次迭代 向梯度的相反方向更新theta
-                theta = theta - eta * dJ(theta, X_b, y)
+                theta = theta - eta * gradient
                 # 是否达到额定的误差
-                if abs(J(lastTheta, X_b, y) - J(theta, X_b, y) < epsilon):
+                if abs(J(lastTheta, X_b, y) - J(theta, X_b, y)) < epsilon:
                     break
                 n_iters += 1
             return theta
@@ -84,10 +85,10 @@ class LinearRegression:
 
         X_b = np.hstack((np.ones((len(X_train), 1)), X_train))
         y = y_train
-        eta = 0.01
+
         initial_theta = np.zeros(X_b.shape[1])
-        self._theta = gd(X_b, y, initial_theta, eta = eta, n_iterations= n_iters)
-        print("theta calculated", self._theta)
+        self._theta = gd(X_b, y, initial_theta, eta, n_iterations= n_iters)
+        #print("theta calculated", self._theta)
         self._updateCoefAndInterception()
         return self
 
