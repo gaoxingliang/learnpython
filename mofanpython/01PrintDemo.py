@@ -10,3 +10,10 @@ print("the c is ", 5)
 price = 1000
 count = 10
 print("price ", price, " count is", count)
+
+name = input("Enter you name:")
+print("hello", name)
+
+tt = True
+if tt and False:
+    print("Impossible")
