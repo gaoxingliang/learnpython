@@ -320,6 +320,53 @@ def linear_activation_backward(dA, cache, activation):
     
     return dA_prev, dW, db
 
+# 和官方的区别就是在于算法.
+# 这里backward应该返回的是前一次的dA_prev, 当前层的dW,db
+# 但是在官方里面不是这样的 它返回的是当前层的dA,dW,db
+# 新加这个函数来对比测试下
+# 测试结果是: 一模一样...  每次迭代后的结果都是一致的
+# 这个是可以理解的,  我这里实际使用的
+def L_model_backward_myVersion(AL, Y, caches):
+    """
+    Implement the backward propagation for the [LINEAR->RELU] * (L-1) -> LINEAR -> SIGMOID group
+
+    Arguments:
+    AL -- probability vector, output of the forward propagation (L_model_forward())
+    Y -- true "label" vector (containing 0 if non-cat, 1 if cat)
+    caches -- list of caches containing:
+                every cache of linear_activation_forward() with "relu" (there are (L-1) or them, indexes from 0 to L-2)
+                the cache of linear_activation_forward() with "sigmoid" (there is one, index L-1)
+
+    Returns:
+    grads -- A dictionary with the gradients
+             grads["dA" + str(l)] = ...
+             grads["dW" + str(l)] = ...
+             grads["db" + str(l)] = ...
+    """
+    grads = {}
+    L = len(caches)  # the number of layers
+    m = AL.shape[1]
+    Y = Y.reshape(AL.shape)  # after this line, Y is the same shape as AL
+
+    # Initializing the backpropagation
+    dAL = - (np.divide(Y, AL) - np.divide(1 - Y, 1 - AL))
+
+    # Lth layer (SIGMOID -> LINEAR) gradients. Inputs: "AL, Y, caches". Outputs: "grads["dAL"], grads["dWL"], grads["dbL"]
+    current_cache = caches[L - 1]
+    grads["dA" + str(L-1)], grads["dW" + str(L)], grads["db" + str(L)] = linear_activation_backward(dAL, current_cache, activation="sigmoid")
+    grads["dA" + str(L)] = dAL
+
+    for l in reversed(range(L - 1)):
+        # lth layer: (RELU -> LINEAR) gradients.
+        current_cache = caches[l]
+        dA_prev_temp, dW_temp, db_temp = linear_activation_backward(grads["dA" + str(l + 1)], current_cache,
+                                                                    activation="relu")
+        grads["dA" + str(l)] = dA_prev_temp
+        grads["dW" + str(l + 1)] = dW_temp
+        grads["db" + str(l + 1)] = db_temp
+
+    return grads
+
 def L_model_backward(AL, Y, caches):
     """
     Implement the backward propagation for the [LINEAR->RELU] * (L-1) -> LINEAR -> SIGMOID group
